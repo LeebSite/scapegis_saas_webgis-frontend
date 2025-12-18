@@ -1,26 +1,22 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { useAuthStore } from "@/lib/store";
 import { useSidebarStore } from "@/lib/store";
-import type { UserRole } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export default function DashboardLayout({
+export default function DeveloperLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const params = useParams();
-  const role = params.role as UserRole;
   const { user } = useAuthStore();
   const { isCollapsed } = useSidebarStore();
 
   return (
-    <ProtectedRoute allowedRoles={role === "admin" ? ["admin"] : ["developer"]}>
+    <ProtectedRoute allowedRoles={["developer"]}>
       <div className="flex h-screen overflow-hidden">
         {user && <Sidebar role={user.role} />}
         <div 

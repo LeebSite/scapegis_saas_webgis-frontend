@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
+import { getDashboardRoute } from "@/lib/utils";
 import type { UserRole } from "@/lib/types";
 
 interface ProtectedRouteProps {
@@ -21,7 +22,9 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     }
 
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-      router.push(`/dashboard/${user.role}`);
+      // Redirect to user's role-based dashboard
+      const dashboardRoute = getDashboardRoute(user.role);
+      router.push(dashboardRoute);
       return;
     }
   }, [isAuthenticated, user, allowedRoles, router]);

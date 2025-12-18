@@ -89,10 +89,11 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Users</h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             Manage platform users and their subscriptions
           </p>
         </div>

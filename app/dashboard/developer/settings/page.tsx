@@ -43,9 +43,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mt-1">
           Manage your account settings and preferences
         </p>
       </div>

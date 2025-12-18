@@ -15,4 +15,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => set({ user: null, isAuthenticated: false }),
 }));
 
+interface SidebarState {
+  isCollapsed: boolean;
+  toggleSidebar: () => void;
+  setCollapsed: (collapsed: boolean) => void;
+}
+
+export const useSidebarStore = create<SidebarState>((set) => ({
+  isCollapsed: false,
+  toggleSidebar: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
+  setCollapsed: (collapsed) => set({ isCollapsed: collapsed }),
+}));
+
 
