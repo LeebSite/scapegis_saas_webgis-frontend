@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 // use native img for logos to avoid Next/Image optimization issues
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/lib/store";
+import { getNavItems } from "@/lib/nav";
+import { useAuthStore } from "@/lib/store";
 import {
   LayoutDashboard,
   Map,
@@ -20,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/lib/types";
 
 interface SidebarProps {
-  role: UserRole;
+  role?: UserRole;
 }
 
 const adminNavItems = [
@@ -42,7 +44,9 @@ const developerNavItems = [
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebarStore();
-  const navItems = role === "admin" ? adminNavItems : developerNavItems;
+  const { user } = useAuthStore();
+  const resolvedRole = role ?? (user?.role as UserRole) ?? "developer";
+  const navItems = getNavItems(resolvedRole);
 
   const isActivePath = (href: string) =>
     pathname.split(/[?#]/)[0] === href;
@@ -50,26 +54,32 @@ export function Sidebar({ role }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r bg-card transition-all duration-300",
+        "flex h-full flex-col border-r bg-card transition-all duration-300 shadow-sm",
         isCollapsed ? "w-16" : "w-64"
       )}
+      aria-label="Primary navigation"
     >
       {/* ================= HEADER ================= */}
       <div className="flex h-16 items-center border-b px-4">
         {!isCollapsed ? (
           <div className="flex w-full items-center justify-between">
             {/* Logo + Brand */}
-            <div className="flex items-center gap-2">
-                <img
-                  src="/img/logo_scapegis.svg"
-                  alt="Scapegis Logo"
-                  width={32}
-                  height={32}
-                  className="block"
-                />
-              <span className="font-kayak text-xl md:text-2xl tracking-wide font-semibold text-[#01123E]">
-                Scapegis
-              </span>
+            <div className="flex items-center gap-3">
+              <img
+                src="/img/logo_scapegis.svg"
+                alt="Scapegis Logo"
+                width={36}
+                height={36}
+                className="block"
+              />
+              <div className="flex flex-col">
+                <span className="font-kayak text-lg md:text-xl tracking-wide font-semibold text-[#01123E]">
+                  Scapegis
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {resolvedRole === "admin" ? "Administrator" : "Developer"}
+                </span>
+              </div>
             </div>
 
             {/* Collapse */}
@@ -113,7 +123,7 @@ export function Sidebar({ role }: SidebarProps) {
       )}
 
       {/* ================= NAVIGATION ================= */}
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-1 p-3" aria-label="Sidebar">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActivePath(item.href);
@@ -131,7 +141,7 @@ export function Sidebar({ role }: SidebarProps) {
                 isCollapsed ? "justify-center" : "gap-3"
               )}
             >
-              <Icon className="h-5 w-5 shrink-0" />
+              <Icon className="h-5 w-5 shrink-0 text-muted-foreground" />
 
               <span
                 className={cn(
