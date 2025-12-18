@@ -91,6 +91,7 @@ export default function LoginPage() {
                 width={48}
                 height={48}
                 priority
+                unoptimized
               />
               <span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">
                 Scapegis

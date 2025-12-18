@@ -86,11 +86,12 @@ export default function RegisterPage() {
           <div className="flex items-center justify-center mb-4">
             <div className="flex items-center gap-2">
               <Image
-                src="/img/logo_scapegis.svg"
+                src="public/img/logo_scapegis.svg"
                 alt="Scapegis Logo"
                 width={48}
                 height={48}
                 priority
+                unoptimized
               />
               <span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">
                 Scapegis

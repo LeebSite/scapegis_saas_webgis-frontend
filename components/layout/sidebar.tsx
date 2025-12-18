@@ -60,12 +60,13 @@ export function Sidebar({ role }: SidebarProps) {
           <div className="flex w-full items-center justify-between">
             {/* Logo + Brand */}
             <div className="flex items-center gap-2">
-              <Image
-                src="/img/logo_scapegis.svg"
+                <Image
+                  src="/img/logo_scapegis.svg"
                 alt="Scapegis Logo"
                 width={32}
                 height={32}
-                priority
+                 priority
+                 unoptimized
               />
               <span className="font-kayak text-xl md:text-2xl tracking-wide font-semibold text-[#01123E]">
                 Scapegis
@@ -91,7 +92,8 @@ export function Sidebar({ role }: SidebarProps) {
               alt="Scapegis Logo"
               width={32}
               height={32}
-              priority
+                priority
+                unoptimized
             />
           </div>
         )}
