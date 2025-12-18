@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
+// use native img for logos to avoid Next/Image optimization issues
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/lib/store";
 import {
@@ -60,14 +60,13 @@ export function Sidebar({ role }: SidebarProps) {
           <div className="flex w-full items-center justify-between">
             {/* Logo + Brand */}
             <div className="flex items-center gap-2">
-                <Image
+                <img
                   src="/img/logo_scapegis.svg"
-                alt="Scapegis Logo"
-                width={32}
-                height={32}
-                 priority
-                 unoptimized
-              />
+                  alt="Scapegis Logo"
+                  width={32}
+                  height={32}
+                  className="block"
+                />
               <span className="font-kayak text-xl md:text-2xl tracking-wide font-semibold text-[#01123E]">
                 Scapegis
               </span>
@@ -87,13 +86,12 @@ export function Sidebar({ role }: SidebarProps) {
         ) : (
           /* Collapsed: Logo only */
           <div className="flex w-full justify-center">
-            <Image
+            <img
               src="/img/logo_scapegis.svg"
               alt="Scapegis Logo"
               width={32}
               height={32}
-                priority
-                unoptimized
+              className="block"
             />
           </div>
         )}

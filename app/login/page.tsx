@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+// use native img tag for logo
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,13 +85,12 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <div className="flex items-center gap-2">
-              <Image
+              <img
                 src="/img/logo_scapegis.svg"
                 alt="Scapegis Logo"
                 width={48}
                 height={48}
-                priority
-                unoptimized
+                className="block"
               />
               <span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">
                 Scapegis
