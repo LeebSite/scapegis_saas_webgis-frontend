@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
+import { WorkspaceSelector } from "@/components/workspace/workspace-selector";
 
 export function Header() {
   const router = useRouter();
@@ -23,12 +24,12 @@ export function Header() {
     router.push("/");
   };
 
-  const initials = user?.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "U";
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "";
 
   return (
     <header className="flex h-16 items-center border-b bg-card px-6">
@@ -39,6 +40,7 @@ export function Header() {
           </h1>
         </div>
         <div className="flex items-center space-x-4">
+          <WorkspaceSelector />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
