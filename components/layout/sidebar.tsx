@@ -134,14 +134,19 @@ export function Sidebar({ role }: SidebarProps) {
               href={item.href}
               title={isCollapsed ? item.label : ""}
               className={cn(
-                "group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:bg-transparent hover:text-primary hover:ring-1 hover:ring-primary/50",
                 isCollapsed ? "justify-center" : "gap-3"
               )}
             >
-              <Icon className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <Icon
+                className={cn(
+                  "h-5 w-5 shrink-0 transition-colors",
+                  isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
+                )}
+              />
 
               <span
                 className={cn(

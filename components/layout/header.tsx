@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
-import { WorkspaceSelector } from "@/components/workspace/workspace-selector";
 
 export function Header() {
   const router = useRouter();
@@ -40,7 +39,6 @@ export function Header() {
           </h1>
         </div>
         <div className="flex items-center space-x-4">
-          <WorkspaceSelector />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">

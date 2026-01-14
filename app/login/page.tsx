@@ -23,12 +23,15 @@ export default function LoginPage() {
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
+		setError(null); // Clear previous errors
+
 		try {
 			const res = await http.post("/auth/login", { email, password });
 			localStorage.setItem("access_token", res.data.access_token);
@@ -39,18 +42,24 @@ export default function LoginPage() {
 
 			const dashboardRoute = getDashboardRoute(me.data.role as UserRole);
 			router.push(dashboardRoute);
-		} catch (err) {
-			// Handle login error silently
+		} catch (err: any) {
+			// Show user-friendly error message
+			const errorMessage =
+				err.response?.data?.message ||
+				err.response?.data?.detail ||
+				"Invalid email or password. Please try again.";
+			setError(errorMessage);
+			console.error("Login failed:", err);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	const handleGoogleSuccess = async (credentialResponse: any) => {
+		setIsLoading(true);
+		setError(null);
+
 		try {
-			// Using the endpoint defined in AuthService: googleLogin or custom fetch as per prompt
-			// The prompt says: POST /auth/oauth/google with { id_token }
-			// AuthService.ts has googleLogin(idToken) which calls /auth/oauth/google
 			const res = await http.post("/auth/oauth/google", { id_token: credentialResponse.credential });
 
 			localStorage.setItem("access_token", res.data.access_token);
@@ -60,8 +69,15 @@ export default function LoginPage() {
 			setUser(me.data);
 			const dashboardRoute = getDashboardRoute(me.data.role as UserRole);
 			router.push(dashboardRoute);
-		} catch (error) {
-			console.error("Google Login Failed", error);
+		} catch (error: any) {
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.detail ||
+				"Google authentication failed. Please try again.";
+			setError(errorMessage);
+			console.error("Google Login Failed:", error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -80,6 +96,18 @@ export default function LoginPage() {
 						<CardDescription className="text-center">Welcome back — please enter your details</CardDescription>
 					</CardHeader>
 					<CardContent>
+						{/* Error Alert */}
+						{error && (
+							<div className="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg relative" role="alert">
+								<div className="flex items-start">
+									<svg className="h-5 w-5 text-red-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+										<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+									</svg>
+									<span className="text-sm font-medium">{error}</span>
+								</div>
+							</div>
+						)}
+
 						<form onSubmit={handleSubmit} className="space-y-4">
 							<div className="space-y-2">
 								<Label htmlFor="email">Email</Label>

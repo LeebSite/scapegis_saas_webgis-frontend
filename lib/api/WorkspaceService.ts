@@ -1,8 +1,11 @@
 import http from "./http";
 import type { Workspace, WorkspaceMember } from "../types";
+import { API_CONFIG } from "./config";
+import * as mockWorkspace from "@/lib/mocks/workspaces";
 
 export interface CreateWorkspaceRequest {
     name: string;
+    description?: string;
 }
 
 export interface InviteMemberRequest {
@@ -32,6 +35,20 @@ export const workspaceAPI = {
      */
     createWorkspace: (data: CreateWorkspaceRequest) =>
         http.post<Workspace>("/workspaces", data),
+
+    /**
+     * Update workspace
+     * PUT /workspaces/{id}
+     */
+    updateWorkspace: (id: string, data: Partial<CreateWorkspaceRequest>) =>
+        http.put<Workspace>(`/workspaces/${id}`, data),
+
+    /**
+     * Delete workspace
+     * DELETE /workspaces/{id}
+     */
+    deleteWorkspace: (id: string) =>
+        http.delete<{ message: string }>(`/workspaces/${id}`),
 
     /**
      * Get workspace members

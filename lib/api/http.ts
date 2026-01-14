@@ -45,9 +45,17 @@ http.interceptors.response.use(
 
     // If not 401 or refresh failed/no refresh token
     if (err.response?.status === 401) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      window.location.href = "/login";
+      // Don't redirect/reload if:
+      // 1. We are already on the login page
+      // 2. The request was to the login endpoint (since a 401 there just means invalid credentials)
+      const isLoginRequest = originalRequest.url?.includes('/auth/login');
+      const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
+
+      if (!isLoginRequest && !isLoginPage) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(err);

@@ -40,11 +40,13 @@ export function WorkspaceSelector() {
     const [selectedWorkspace, setSelectedWorkspace] = React.useState<Workspace | null>(null);
     const [newWorkspaceName, setNewWorkspaceName] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
 
     // Fetch workspaces on mount
     React.useEffect(() => {
         const fetchWorkspaces = async () => {
             try {
+                setError(null);
                 const res = await workspaceAPI.getWorkspaces();
                 setWorkspaces(res.data);
                 if (res.data.length > 0) {
@@ -53,8 +55,14 @@ export function WorkspaceSelector() {
                     const found = res.data.find(w => w.id === storedId);
                     setSelectedWorkspace(found || res.data[0]);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to fetch workspaces:", error);
+                // Check if it's a 404 error (endpoint not implemented)
+                if (error?.response?.status === 404) {
+                    setError("Workspace feature not available");
+                } else {
+                    setError("Failed to load workspaces");
+                }
             }
         };
         fetchWorkspaces();
@@ -91,8 +99,12 @@ export function WorkspaceSelector() {
                         role="combobox"
                         aria-expanded={open}
                         className="w-[200px] justify-between"
+                        disabled={!!error}
+                        title={error || undefined}
                     >
-                        {selectedWorkspace ? (
+                        {error ? (
+                            <span className="truncate text-muted-foreground">{error}</span>
+                        ) : selectedWorkspace ? (
                             <div className="flex items-center gap-2 truncate">
                                 <span className="truncate font-medium">{selectedWorkspace.name}</span>
                             </div>
