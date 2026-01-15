@@ -6,7 +6,7 @@ export function ActiveMaps() {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Active Maps</h3>
+      <h3 className="text-lg font-semibold mb-2">Peta Aktif</h3>
       <div className="grid gap-3 md:grid-cols-3">
         {maps.map((m) => (
           <Card key={m.id}>
@@ -15,7 +15,7 @@ export function ActiveMaps() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">Status: {m.status}</p>
-              <p className="text-sm text-muted-foreground">Region: {m.region ?? "—"}</p>
+              <p className="text-sm text-muted-foreground">Wilayah: {m.region ?? "—"}</p>
             </CardContent>
           </Card>
         ))}

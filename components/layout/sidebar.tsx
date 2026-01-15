@@ -26,19 +26,19 @@ interface SidebarProps {
 }
 
 const adminNavItems = [
-  { href: "/dashboard/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/admin/projects", label: "Project", icon: FolderKanban },
-  { href: "/dashboard/admin/maps", label: "Maps", icon: Map },
-  { href: "/dashboard/admin/users", label: "Users", icon: Users },
-  { href: "/dashboard/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/admin", label: "Dasbor", icon: LayoutDashboard },
+  { href: "/dashboard/admin/projects", label: "Proyek", icon: FolderKanban },
+  { href: "/dashboard/admin/maps", label: "Peta", icon: Map },
+  { href: "/dashboard/admin/users", label: "Pengguna", icon: Users },
+  { href: "/dashboard/admin/analytics", label: "Analitik", icon: BarChart3 },
+  { href: "/dashboard/admin/settings", label: "Pengaturan", icon: Settings },
 ];
 
 const developerNavItems = [
-  { href: "/dashboard/developer", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/developer/projects", label: "Project", icon: FolderKanban },
-  { href: "/dashboard/developer/subscription", label: "Subscription", icon: CreditCard },
-  { href: "/dashboard/developer/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/developer", label: "Dasbor", icon: LayoutDashboard },
+  { href: "/dashboard/developer/projects", label: "Proyek", icon: FolderKanban },
+  { href: "/dashboard/developer/subscription", label: "Langganan", icon: CreditCard },
+  { href: "/dashboard/developer/settings", label: "Pengaturan", icon: Settings },
 ];
 
 export function Sidebar({ role }: SidebarProps) {
@@ -46,7 +46,9 @@ export function Sidebar({ role }: SidebarProps) {
   const { isCollapsed, toggleSidebar } = useSidebarStore();
   const { user } = useAuthStore();
   const resolvedRole = role ?? (user?.role as UserRole) ?? "developer";
-  const navItems = getNavItems(resolvedRole);
+
+  // Use local nav config instead of getNavItems to ensure translation
+  const navItems = resolvedRole === 'admin' ? adminNavItems : developerNavItems;
 
   const isActivePath = (href: string) =>
     pathname.split(/[?#]/)[0] === href;
@@ -57,7 +59,7 @@ export function Sidebar({ role }: SidebarProps) {
         "flex h-full flex-col border-r bg-card transition-all duration-300 shadow-sm",
         isCollapsed ? "w-16" : "w-64"
       )}
-      aria-label="Primary navigation"
+      aria-label="Navigasi Utama"
     >
       {/* ================= HEADER ================= */}
       <div className="flex h-16 items-center border-b px-4">
@@ -77,7 +79,7 @@ export function Sidebar({ role }: SidebarProps) {
                   Scapegis
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {resolvedRole === "admin" ? "Administrator" : "Developer"}
+                  {resolvedRole === "admin" ? "Administrator" : "Pengembang"}
                 </span>
               </div>
             </div>

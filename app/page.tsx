@@ -9,11 +9,9 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">S</span>
-            </div>
-            <span className="text-xl font-semibold">Scapegis</span>
+          <div className="flex items-center gap-2">
+            <img src="/img/logo_scapegis.svg" alt="Scapegis Logo" width={32} height={32} className="block" />
+            <span className="font-kayak text-xl tracking-wide font-semibold text-[#01123E]">Scapegis</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/login">

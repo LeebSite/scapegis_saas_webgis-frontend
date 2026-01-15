@@ -7,11 +7,11 @@ export function WelcomeCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Welcome back, {user?.name ?? "User"}</CardTitle>
-        <CardDescription>Your account status: {user ? "Active" : "Guest"}</CardDescription>
+        <CardTitle>Selamat datang kembali, {user?.name ?? "Pengguna"}</CardTitle>
+        <CardDescription>Status akun Anda: {user ? "Aktif" : "Tamu"}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Use the dashboard to manage projects, maps and subscriptions.</p>
+        <p className="text-sm text-muted-foreground">Gunakan dasbor untuk mengelola proyek, peta, dan langganan.</p>
       </CardContent>
     </Card>
   );

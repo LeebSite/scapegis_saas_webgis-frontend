@@ -35,7 +35,7 @@ export function Header() {
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center space-x-4">
           <h1 className="text-lg font-semibold">
-            {user?.role === "admin" ? "Admin Dashboard" : "Developer Dashboard"}
+            {user?.role === "admin" ? "Dasbor Admin" : "Dasbor Pengembang"}
           </h1>
         </div>
         <div className="flex items-center space-x-4">
@@ -43,7 +43,14 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar>
-                  <AvatarFallback>{initials}</AvatarFallback>
+                  {user?.avatar_url ? (
+                    // @ts-ignore - AvatarImage component might be missing from import or not exported, using img for now if needed or standard AvatarImage if available in shadcn
+                    // Actually let's check imports. standard shadcn Avatar has AvatarImage.
+                    // Assuming standard shadcn implementation:
+                    <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  )}
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -62,7 +69,7 @@ export function Header() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Keluar</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
