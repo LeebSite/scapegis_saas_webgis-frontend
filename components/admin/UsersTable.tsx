@@ -172,7 +172,7 @@ export function UsersTable({
                                     <RoleBadge role={user.role} />
                                 </TableCell>
                                 <TableCell>
-                                    <AuthProviderBadge provider={user.auth_provider} />
+                                    <AuthProviderBadge provider={user.auth_provider as "local" | "google" || "local"} />
                                 </TableCell>
                                 <TableCell>
                                     <StatusToggle
@@ -189,7 +189,7 @@ export function UsersTable({
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant="outline">{user.workspace_count}</Badge>
+                                    <Badge variant="outline">{user.workspace_count ?? 0}</Badge>
                                 </TableCell>
                                 <TableCell>
                                     <div className="text-sm">

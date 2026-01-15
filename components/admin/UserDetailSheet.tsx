@@ -138,7 +138,7 @@ export function UserDetailSheet({
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <RoleBadge role={userDetail.role} />
-                                        <AuthProviderBadge provider={userDetail.auth_provider} />
+                                        <AuthProviderBadge provider={(userDetail.auth_provider || 'local') as "local" | "google"} />
                                         {userDetail.is_verified ? (
                                             <Badge variant="outline" className="gap-1 text-green-600">
                                                 <CheckCircle className="h-3 w-3" />
@@ -173,7 +173,9 @@ export function UserDetailSheet({
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm text-muted-foreground">Last Updated</span>
                                         <span className="text-sm">
-                                            {format(new Date(userDetail.updated_at), "MMM dd, yyyy HH:mm")}
+                                            {userDetail.updated_at
+                                                ? format(new Date(userDetail.updated_at), "MMM dd, yyyy HH:mm")
+                                                : "N/A"}
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between">
@@ -241,10 +243,10 @@ export function UserDetailSheet({
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <Briefcase className="h-4 w-4" />
-                                    <h4 className="font-semibold">Workspaces ({userDetail.workspaces.length})</h4>
+                                    <h4 className="font-semibold">Workspaces ({userDetail.workspaces?.length || 0})</h4>
                                 </div>
 
-                                {userDetail.workspaces.length === 0 ? (
+                                {(!userDetail.workspaces || userDetail.workspaces.length === 0) ? (
                                     <p className="text-sm text-muted-foreground py-4 text-center">
                                         No workspaces found
                                     </p>

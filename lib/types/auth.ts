@@ -1,8 +1,11 @@
 // ===== ENUMS =====
-export enum UserRole {
-    ADMIN = 'ADMIN',
-    DEVELOPER = 'DEVELOPER'
-}
+// ===== ENUMS =====
+export type UserRole = 'admin' | 'developer';
+// Deprecated enum for backward compatibility if needed, but better to remove
+// export enum UserRoleEnum {
+//     ADMIN = 'admin',
+//     DEVELOPER = 'developer'
+// }
 
 export enum AuthProvider {
     LOCAL = 'local',

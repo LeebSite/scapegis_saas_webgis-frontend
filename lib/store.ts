@@ -5,6 +5,7 @@ import http from "./api/http";
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isInitialized: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
   initializeAuth: () => Promise<void> | void;
@@ -13,6 +14,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  isInitialized: false,
   setUser: (user) => {
     set({ user, isAuthenticated: !!user });
   },
@@ -23,17 +25,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   initializeAuth: async () => {
     if (typeof window === "undefined") return;
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
 
+    // We now use HttpOnly cookies, so we just try to fetch the current user.
+    // Ensure we import getCurrentUser from authService.
     try {
-      const res = await http.get("/auth/me");
-      const userData = res.data;
-      set({ user: userData, isAuthenticated: true });
+      const { getCurrentUser } = await import("./api/authService");
+      const user = await getCurrentUser();
+      set({ user, isAuthenticated: true, isInitialized: true });
     } catch (err) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      set({ user: null, isAuthenticated: false });
+      // If 401 or network error, user is not authenticated.
+      set({ user: null, isAuthenticated: false, isInitialized: true });
     }
   },
 }));

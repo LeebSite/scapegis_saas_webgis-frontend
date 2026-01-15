@@ -20,7 +20,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 console.log('🔧 Auth Service - API URL configured as:', API_URL);
 
 // ===== HELPER =====
-async function fetchAPI<T>(
+export async function fetchAPI<T>(
     endpoint: string,
     options?: RequestInit
 ): Promise<T> {

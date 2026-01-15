@@ -70,7 +70,7 @@ export default function HomePage() {
             <CardHeader>
               <CardTitle>Akses Berbasis Peran</CardTitle>
               <CardDescription>
-                Dasbor khusus untuk admin dan pengembang properti
+                Beranda khusus untuk admin dan pengembang properti
               </CardDescription>
             </CardHeader>
           </Card>

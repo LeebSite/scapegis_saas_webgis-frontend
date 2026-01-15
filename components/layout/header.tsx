@@ -35,7 +35,7 @@ export function Header() {
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center space-x-4">
           <h1 className="text-lg font-semibold">
-            {user?.role === "admin" ? "Dasbor Admin" : "Dasbor Pengembang"}
+            {user?.role === "admin" ? "Beranda Admin" : "Beranda Pengembang"}
           </h1>
         </div>
         <div className="flex items-center space-x-4">

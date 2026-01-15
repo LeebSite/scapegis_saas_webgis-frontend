@@ -11,7 +11,7 @@ export function WelcomeCard() {
         <CardDescription>Status akun Anda: {user ? "Aktif" : "Tamu"}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Gunakan dasbor untuk mengelola proyek, peta, dan langganan.</p>
+        <p className="text-sm text-muted-foreground">Gunakan beranda untuk mengelola proyek, peta, dan langganan.</p>
       </CardContent>
     </Card>
   );

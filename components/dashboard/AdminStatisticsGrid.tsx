@@ -52,14 +52,18 @@ export function AdminStatisticsGrid({ data, isLoading, isError, refetch }: Admin
     }
 
     // Calculate users by role breakdown
-    const roleBreakdown = Object.entries(data.users_by_role)
-        .map(([role, count]) => `${role}: ${count}`)
-        .join(", ");
+    const roleBreakdown = data.users_by_role
+        ? Object.entries(data.users_by_role)
+            .map(([role, count]) => `${role}: ${count}`)
+            .join(", ")
+        : "N/A";
 
     // Calculate users by auth provider breakdown
-    const authBreakdown = Object.entries(data.users_by_auth_provider)
-        .map(([provider, count]) => `${provider}: ${count}`)
-        .join(", ");
+    const authBreakdown = data.users_by_auth_provider
+        ? Object.entries(data.users_by_auth_provider)
+            .map(([provider, count]) => `${provider}: ${count}`)
+            .join(", ")
+        : "N/A";
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -74,7 +78,7 @@ export function AdminStatisticsGrid({ data, isLoading, isError, refetch }: Admin
                 title="Active Users"
                 value={data.active_users}
                 icon={UserCheck}
-                description={`${data.inactive_users} inactive`}
+                description={`${data.inactive_users ?? 0} inactive`}
             />
 
             <StatisticsCard
@@ -93,21 +97,21 @@ export function AdminStatisticsGrid({ data, isLoading, isError, refetch }: Admin
 
             <StatisticsCard
                 title="Total Workspaces"
-                value={data.total_workspaces}
+                value={data.total_workspaces ?? 0}
                 icon={Briefcase}
                 description="Active workspaces"
             />
 
             <StatisticsCard
                 title="Users by Role"
-                value={Object.values(data.users_by_role).reduce((a, b) => a + b, 0)}
+                value={data.users_by_role ? Object.values(data.users_by_role).reduce((a, b) => a + b, 0) : 0}
                 icon={Shield}
                 subtitle={roleBreakdown}
             />
 
             <StatisticsCard
                 title="Auth Providers"
-                value={Object.keys(data.users_by_auth_provider).length}
+                value={data.users_by_auth_provider ? Object.keys(data.users_by_auth_provider).length : 0}
                 icon={Key}
                 subtitle={authBreakdown}
             />
