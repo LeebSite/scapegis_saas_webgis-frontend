@@ -1,110 +1,145 @@
-import http from "./http";
+import {
+    SignupInitRequest,
+    SignupInitResponse,
+    SignupPasswordRequest,
+    SignupPasswordResponse,
+    SignupVerifyRequest,
+    SignupVerifyResponse,
+    SignupCompleteRequest,
+    LoginRequest,
+    GoogleOAuthRequest,
+    AdminMagicLinkRequest,
+    AdminMagicLinkResponse,
+    AuthTokens,
+    User
+} from '@/lib/types/auth';
 
-export interface LoginRequest {
-  email: string;
-  password: string;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// ✅ DEBUG: Log API URL on module load
+console.log('🔧 Auth Service - API URL configured as:', API_URL);
+
+// ===== HELPER =====
+async function fetchAPI<T>(
+    endpoint: string,
+    options?: RequestInit
+): Promise<T> {
+    const fullUrl = `${API_URL}${endpoint}`;
+
+    // ✅ DEBUG: Log every API call
+    console.log('📡 API Call:', fullUrl);
+
+    const response = await fetch(fullUrl, {
+        ...options,
+        credentials: 'include', // CRITICAL: for HttpOnly cookies
+        headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({
+            detail: `HTTP ${response.status}`
+        }));
+
+        // ✅ FIX: Throw Error with string message
+        const errorMessage = error.detail ||
+            error.message ||
+            `HTTP ${response.status}`;
+        throw new Error(errorMessage);
+    }
+
+    return response.json();
 }
 
-import type { UserRole } from "../types";
+// ===== DEVELOPER SIGNUP (Multi-step) =====
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  name: string;
-  role?: UserRole;
+export async function signupInit(
+    data: SignupInitRequest
+): Promise<SignupInitResponse> {
+    return fetchAPI('/api/v1/auth/signup/init', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
+export async function signupPassword(
+    data: SignupPasswordRequest
+): Promise<SignupPasswordResponse> {
+    return fetchAPI('/api/v1/auth/signup/password', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export interface GoogleLoginResponse {
-  authorization_url: string;
+export async function signupVerify(
+    data: SignupVerifyRequest
+): Promise<SignupVerifyResponse> {
+    return fetchAPI('/api/v1/auth/signup/verify', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export interface GoogleCallbackRequest {
-  code: string;
-  redirect_uri?: string;
+export async function signupComplete(
+    data: SignupCompleteRequest
+): Promise<AuthTokens> {
+    return fetchAPI('/api/v1/auth/signup/complete', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export interface GoogleCallbackResponse {
-  access_token: string;
-  user: any;
+// ===== DEVELOPER LOGIN =====
+
+export async function login(
+    data: LoginRequest
+): Promise<AuthTokens> {
+    return fetchAPI('/api/v1/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export interface UpdateUserRoleRequest {
-  user_id: string;
-  role: UserRole;
+export async function googleOAuth(
+    data: GoogleOAuthRequest
+): Promise<AuthTokens> {
+    return fetchAPI('/api/v1/auth/oauth/google', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 }
 
-export const authAPI = {
-  /**
-   * Register a new user
-   * POST /auth/register
-   */
-  register: (data: RegisterRequest) =>
-    http.post<LoginResponse>("/auth/register", data),
+// ===== ADMIN LOGIN =====
 
-  /**
-   * Login with email and password
-   * POST /auth/login
-   */
-  login: (data: LoginRequest) =>
-    http.post<LoginResponse>("/auth/login", data),
+export async function adminRequestMagicLink(
+    data: AdminMagicLinkRequest
+): Promise<AdminMagicLinkResponse> {
+    return fetchAPI('/api/v1/auth/admin/request-link', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
 
-  /**
-   * Get current user information
-   * GET /auth/me
-   */
-  getMe: () =>
-    http.get("/auth/me"),
+export async function adminVerifyMagicLink(
+    token: string
+): Promise<AuthTokens> {
+    return fetchAPI(`/api/v1/auth/admin/verify?token=${token}`, {
+        method: 'GET',
+    });
+}
 
-  /**
-   * Update user role (admin only)
-   * PUT /auth/users/role
-   */
-  updateUserRole: (data: UpdateUserRoleRequest) =>
-    http.put("/auth/users/role", data),
+// ===== USER INFO =====
 
-  /**
-   * Get Google OAuth login URL
-   * GET /auth/google/login
-   */
-  getGoogleLoginUrl: () =>
-    http.get<GoogleLoginResponse>("/auth/google/login"),
+export async function getCurrentUser(): Promise<User> {
+    return fetchAPI('/api/v1/auth/me', {
+        method: 'GET',
+    });
+}
 
-  /**
-   * Handle Google OAuth callback
-   * POST /auth/google/callback
-   */
-  /**
-   * Handle Google OAuth callback
-   * POST /auth/google/callback
-   */
-  googleCallback: (data: GoogleCallbackRequest) =>
-    http.post<GoogleCallbackResponse>("/auth/google/callback", data),
-
-  /**
-   * Refresh access token
-   * POST /auth/refresh
-   */
-  refreshToken: (refreshToken: string) =>
-    http.post<{ access_token: string }>("/auth/refresh", { refresh_token: refreshToken }),
-
-  /**
-   * Logout
-   * POST /auth/logout
-   */
-  logout: (refreshToken: string) =>
-    http.post<{ message: string }>("/auth/logout", { refresh_token: refreshToken }),
-
-  /**
-    * Google OAuth (New)
-    * POST /auth/oauth/google
-    */
-  googleLogin: (idToken: string) =>
-    http.post<LoginResponse>("/auth/oauth/google", { id_token: idToken }),
-};
-
+export async function logout(): Promise<void> {
+    await fetchAPI('/api/v1/auth/logout', {
+        method: 'POST',
+    });
+}

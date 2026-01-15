@@ -3,51 +3,103 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-// use native img tag for logo
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { UserRole } from "@/lib/types";
+import { UserRole } from "@/lib/types/auth";
 import { getDashboardRoute } from "@/lib/utils";
-import http from "@/lib/api/http";
-
+import { login, googleOAuth, getCurrentUser, signupInit, adminRequestMagicLink } from "@/lib/api/authService";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+
+type LoginStep = 'email' | 'password' | 'admin-link-sent';
 
 export default function LoginPage() {
 	const router = useRouter();
 	const setUser = useAuthStore((state) => state.setUser);
 
+	const [step, setStep] = useState<LoginStep>('email');
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-
-
-	const handleSubmit = async (e: React.FormEvent) => {
+	// Step 1: Check email to determine flow
+	const handleEmailContinue = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
-		setError(null); // Clear previous errors
+		setError(null);
 
 		try {
-			const res = await http.post("/auth/login", { email, password });
-			localStorage.setItem("access_token", res.data.access_token);
-			localStorage.setItem("refresh_token", res.data.refresh_token);
+			// Call backend to check if email exists and get role
+			const response = await signupInit({ email });
 
-			const me = await http.get("/auth/me");
-			setUser(me.data);
+			// If password_required, this is an existing developer or new signup
+			if (response.status === 'password_required') {
+				// For existing users, show password field
+				// For new users, backend will handle this in signup flow
+				setStep('password');
+			}
+		} catch (err: any) {
+			const errorMsg = err.message || "";
 
-			const dashboardRoute = getDashboardRoute(me.data.role as UserRole);
+			// Check if this is "email not found" or "user doesn't exist"
+			if (errorMsg.toLowerCase().includes('not found') ||
+				errorMsg.toLowerCase().includes('does not exist') ||
+				errorMsg.toLowerCase().includes('no user')) {
+				// New user - redirect to signup flow
+				sessionStorage.setItem('signup_email', email);
+				router.push('/signup/password');
+				return;
+			}
+
+			// Check if this is an admin email
+			if (errorMsg.toLowerCase().includes('admin')) {
+				// Send magic link for admin
+				try {
+					await adminRequestMagicLink({ email });
+					setStep('admin-link-sent');
+				} catch (adminErr: any) {
+					setError(adminErr.message || "Failed to send magic link");
+				}
+			} else {
+				// Other errors
+				setError(errorMsg || "Failed to continue");
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// Step 2: Login with password (for existing developers)
+	const handlePasswordLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsLoading(true);
+		setError(null);
+
+		try {
+			await login({ email, password });
+			const user = await getCurrentUser();
+			setUser(user);
+
+			const dashboardRoute = getDashboardRoute(user.role);
 			router.push(dashboardRoute);
 		} catch (err: any) {
-			// Show user-friendly error message
-			const errorMessage =
-				err.response?.data?.message ||
-				err.response?.data?.detail ||
-				"Invalid email or password. Please try again.";
+			const errorMessage = err.message || "Invalid email or password. Please try again.";
+
+			// Check if this is a "user not found" error (new user)
+			if (errorMessage.toLowerCase().includes('not found') ||
+				errorMessage.toLowerCase().includes('does not exist') ||
+				errorMessage.toLowerCase().includes('no user')) {
+				// User doesn't exist - redirect to signup flow
+				sessionStorage.setItem('signup_email', email);
+				sessionStorage.setItem('signup_password', password);
+				router.push('/signup/password');
+				return;
+			}
+
+			// Other errors (wrong password, etc.)
 			setError(errorMessage);
 			console.error("Login failed:", err);
 		} finally {
@@ -60,20 +112,13 @@ export default function LoginPage() {
 		setError(null);
 
 		try {
-			const res = await http.post("/auth/oauth/google", { id_token: credentialResponse.credential });
-
-			localStorage.setItem("access_token", res.data.access_token);
-			localStorage.setItem("refresh_token", res.data.refresh_token);
-
-			const me = await http.get("/auth/me");
-			setUser(me.data);
-			const dashboardRoute = getDashboardRoute(me.data.role as UserRole);
+			await googleOAuth({ id_token: credentialResponse.credential });
+			const user = await getCurrentUser();
+			setUser(user);
+			const dashboardRoute = getDashboardRoute(user.role);
 			router.push(dashboardRoute);
 		} catch (error: any) {
-			const errorMessage =
-				error.response?.data?.message ||
-				error.response?.data?.detail ||
-				"Google authentication failed. Please try again.";
+			const errorMessage = error.message || "Google authentication failed. Please try again.";
 			setError(errorMessage);
 			console.error("Google Login Failed:", error);
 		} finally {
@@ -81,8 +126,83 @@ export default function LoginPage() {
 		}
 	};
 
-	return (
-		<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID"}>
+	// Email step - ChatGPT style
+	if (step === 'email') {
+		return (
+			<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID"}>
+				<div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+					<Card className="w-full max-w-md">
+						<CardHeader className="space-y-1">
+							<div className="flex items-center justify-center mb-4">
+								<div className="flex items-center gap-2">
+									<img src="/img/logo_scapegis.svg" alt="Scapegis Logo" width={48} height={48} className="block" />
+									<span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">Scapegis</span>
+								</div>
+							</div>
+							<CardTitle className="text-2xl text-center">Log in or sign up</CardTitle>
+							<CardDescription className="text-center">You'll get smarter responses and can upload files, images, and more.</CardDescription>
+						</CardHeader>
+						<CardContent>
+							{/* Google OAuth Button */}
+							<div className="flex justify-center mb-4">
+								<div className="w-full">
+									<GoogleLogin
+										onSuccess={handleGoogleSuccess}
+										text="continue_with"
+										width="100%"
+										size="large"
+									/>
+								</div>
+							</div>
+
+							{/* Divider */}
+							<div className="relative my-4">
+								<div className="absolute inset-0 flex items-center">
+									<span className="w-full border-t" />
+								</div>
+								<div className="relative flex justify-center text-xs uppercase">
+									<span className="bg-card px-2 text-muted-foreground">OR</span>
+								</div>
+							</div>
+
+							{/* Email Form */}
+							<form onSubmit={handleEmailContinue} className="space-y-4">
+								<div>
+									<Input
+										id="email"
+										type="email"
+										placeholder="Email address"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
+										autoFocus
+									/>
+								</div>
+
+								{error && (
+									<div className="bg-destructive/10 border border-destructive/20 rounded-md p-3 text-destructive text-sm">
+										{error}
+									</div>
+								)}
+
+								<Button
+									type="submit"
+									disabled={isLoading}
+									className="w-full"
+								>
+									{isLoading ? 'Checking...' : 'Continue'}
+								</Button>
+							</form>
+						</CardContent>
+					</Card>
+				</div>
+			</GoogleOAuthProvider>
+		);
+	}
+
+	// Password step - for existing developers
+	if (step === 'password') {
+		return (
 			<div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
 				<Card className="w-full max-w-md">
 					<CardHeader className="space-y-1">
@@ -92,37 +212,33 @@ export default function LoginPage() {
 								<span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">Scapegis</span>
 							</div>
 						</div>
-						<CardTitle className="text-2xl text-center">Sign in to your account</CardTitle>
-						<CardDescription className="text-center">Welcome back — please enter your details</CardDescription>
+						<CardTitle className="text-2xl text-center">Enter your password</CardTitle>
 					</CardHeader>
 					<CardContent>
-						{/* Error Alert */}
-						{error && (
-							<div className="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg relative" role="alert">
-								<div className="flex items-start">
-									<svg className="h-5 w-5 text-red-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-										<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-									</svg>
-									<span className="text-sm font-medium">{error}</span>
-								</div>
-							</div>
-						)}
+						{/* Show email (read-only) */}
+						<div className="mb-4 p-3 bg-muted rounded-md">
+							<p className="text-sm text-muted-foreground">Email</p>
+							<p className="font-medium">{email}</p>
+							<button
+								onClick={() => setStep('email')}
+								className="text-sm text-primary hover:underline mt-1"
+							>
+								Edit
+							</button>
+						</div>
 
-						<form onSubmit={handleSubmit} className="space-y-4">
-							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
-								<Input id="email" type="email" placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-							</div>
-
-							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
+						{/* Password Form */}
+						<form onSubmit={handlePasswordLogin} className="space-y-4">
+							<div>
 								<div className="relative">
 									<Input
 										id="password"
 										type={showPassword ? "text" : "password"}
+										placeholder="Password"
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
 										required
+										autoFocus
 										className="pr-10"
 									/>
 									<button
@@ -145,29 +261,63 @@ export default function LoginPage() {
 								</div>
 							</div>
 
-							<Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? "Signing in..." : "Sign in"}</Button>
+							{error && (
+								<div className="bg-destructive/10 border border-destructive/20 rounded-md p-3 text-destructive text-sm">
+									{error}
+								</div>
+							)}
+
+							<Button type="submit" disabled={isLoading} className="w-full">
+								{isLoading ? 'Signing in...' : 'Continue'}
+							</Button>
 						</form>
 
-						<div className="relative my-4">
-							<div className="absolute inset-0 flex items-center">
-								<span className="w-full border-t" />
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-							</div>
-						</div>
-
-						<div className="flex justify-center w-full">
-							<GoogleLogin onSuccess={handleGoogleSuccess} />
-						</div>
-
+						{/* Link to signup */}
 						<div className="mt-4 text-center text-sm">
 							<span className="text-muted-foreground">Don't have an account? </span>
-							<Link href="/register" className="text-primary hover:underline">Create one</Link>
+							<Link href="/signup" className="text-primary hover:underline">
+								Sign up
+							</Link>
 						</div>
 					</CardContent>
 				</Card>
 			</div>
-		</GoogleOAuthProvider>
-	);
+		);
+	}
+
+	// Admin magic link sent
+	if (step === 'admin-link-sent') {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+				<Card className="w-full max-w-md">
+					<CardContent className="pt-6">
+						<div className="text-center">
+							<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+								<svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+								</svg>
+							</div>
+							<h2 className="text-2xl font-bold mb-2">Check your email</h2>
+							<p className="text-muted-foreground mb-4">
+								We've sent a magic link to <strong>{email}</strong>.
+								Click the link to sign in as admin.
+							</p>
+							<p className="text-sm text-muted-foreground">
+								The link expires in 10 minutes.
+							</p>
+							<Button
+								variant="ghost"
+								onClick={() => setStep('email')}
+								className="mt-4"
+							>
+								← Back to login
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
+	return null;
 }

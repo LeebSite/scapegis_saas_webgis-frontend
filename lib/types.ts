@@ -1,15 +1,9 @@
-export type UserRole = "admin" | "developer" | "property_developer" | "gis_analyst" | "viewer";
+// Re-export auth types for backward compatibility
+import type { UserRole as AuthUserRole, User as AuthUser } from './types/auth';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar_url?: string;
-  is_verified: boolean;
-  auth_provider: "local" | "google";
-  created_at?: string;
-}
+export type UserRole = AuthUserRole;
+export type User = AuthUser;
+
 
 export interface Workspace {
   id: string;

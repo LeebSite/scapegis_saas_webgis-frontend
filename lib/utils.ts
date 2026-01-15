@@ -7,14 +7,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getDashboardRoute(role: UserRole): string {
+  // Convert enum to lowercase string for comparison
+  const roleStr = typeof role === 'string' ? role.toLowerCase() : String(role).toLowerCase();
+
   // Map user roles to their respective dashboard routes
-  const roleRoutes: Record<UserRole, string> = {
-    admin: "/dashboard/admin",
-    developer: "/dashboard/developer",
-    property_developer: "/dashboard/property_developer",
-    gis_analyst: "/dashboard/gis_analyst",
-    viewer: "/dashboard/viewer"
+  const roleRoutes: Record<string, string> = {
+    'admin': "/dashboard/admin",
+    'developer': "/dashboard/developer",
+    'property_developer': "/dashboard/property_developer",
+    'gis_analyst': "/dashboard/gis_analyst",
+    'viewer': "/dashboard/viewer"
   };
 
-  return roleRoutes[role] || "/dashboard/developer";
+  return roleRoutes[roleStr] || "/dashboard/developer";
 }

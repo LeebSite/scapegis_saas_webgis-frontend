@@ -7,7 +7,9 @@
  * import { authAPI, adminAPI, aiAPI, subscriptionAPI } from '@/lib/api';
  */
 
-export { authAPI } from "./AuthService";
+// Note: Auth functions are now exported directly from './authService'
+// Use: import { login, getCurrentUser, etc } from '@/lib/api/authService'
+
 export { adminAPI } from "./AdminService";
 export { aiAPI } from "./AIService";
 export { subscriptionAPI } from "./SubscriptionService";
@@ -17,14 +19,6 @@ export { projectAPI } from "./ProjectService";
 export { layerAPI } from "./LayerService";
 
 // Re-export types
-export type {
-  LoginRequest,
-  RegisterRequest,
-  LoginResponse,
-  GoogleLoginResponse,
-  GoogleCallbackRequest,
-  GoogleCallbackResponse,
-} from "./AuthService";
 
 export type {
   UpdateUserStatusRequest,
