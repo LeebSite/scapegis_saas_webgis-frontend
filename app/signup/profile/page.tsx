@@ -38,7 +38,7 @@ export default function SignupProfilePage() {
         // ✅ Validate birthday format (YYYY-MM-DD)
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(birthday)) {
-            setError('Invalid birthday format. Please select a valid date.');
+            setError('Format tanggal lahir salah. Silakan pilih tanggal yang valid.');
             setLoading(false);
             return;
         }
@@ -71,7 +71,7 @@ export default function SignupProfilePage() {
             // Redirect to login (tokens should be set by backend via cookies)
             router.push('/dashboard/developer');
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Failed to create account';
+            const errorMessage = err instanceof Error ? err.message : 'Gagal membuat akun';
             console.error('❌ Signup Complete Error:', errorMessage);
             setError(errorMessage);
         } finally {
@@ -83,17 +83,17 @@ export default function SignupProfilePage() {
         <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
             <div className="max-w-md w-full space-y-8 p-8 bg-card rounded-lg shadow-lg border">
                 <div>
-                    <h2 className="text-3xl font-bold">Let's confirm your age</h2>
+                    <h2 className="text-3xl font-bold">Konfirmasi usia Anda</h2>
                     <p className="mt-2 text-muted-foreground">
-                        This helps us personalize your experience and provide
-                        the right settings, in line with our Privacy Policy
+                        Ini membantu kami mempersonalisasi pengalaman Anda dan memberikan
+                        pengaturan yang tepat, sesuai dengan Kebijakan Privasi kami
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium mb-2">
-                            Full name
+                            Nama Lengkap
                         </label>
                         <Input
                             id="name"
@@ -108,7 +108,7 @@ export default function SignupProfilePage() {
 
                     <div>
                         <label htmlFor="birthday" className="block text-sm font-medium mb-2">
-                            Birthday
+                            Tanggal Lahir
                         </label>
                         <Input
                             id="birthday"
@@ -126,14 +126,14 @@ export default function SignupProfilePage() {
                     )}
 
                     <div className="text-xs text-muted-foreground">
-                        By clicking "Continue", you agree to our{' '}
-                        <a href="/terms" className="text-primary hover:underline">Terms</a>
-                        {' '}and have read our{' '}
-                        <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
+                        Dengan mengklik "Lanjutkan", Anda menyetujui{' '}
+                        <a href="/terms" className="text-primary hover:underline">Syarat & Ketentuan</a>
+                        {' '}dan telah membaca{' '}
+                        <a href="/privacy" className="text-primary hover:underline">Kebijakan Privasi</a> kami.
                     </div>
 
                     <Button type="submit" disabled={loading} className="w-full">
-                        {loading ? 'Creating account...' : 'Continue'}
+                        {loading ? 'Membuat akun...' : 'Lanjutkan'}
                     </Button>
                 </form>
             </div>

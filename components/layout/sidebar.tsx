@@ -26,16 +26,16 @@ interface SidebarProps {
 }
 
 const adminNavItems = [
-  { href: "/dashboard/admin", label: "Dasbor", icon: LayoutDashboard },
+  { href: "/dashboard/admin", label: "Beranda", icon: LayoutDashboard },
   { href: "/dashboard/admin/projects", label: "Proyek", icon: FolderKanban },
-  { href: "/dashboard/admin/maps", label: "Peta", icon: Map },
+  { href: "/dashboard/admin/maps", label: "Peta Aktif", icon: Map },
   { href: "/dashboard/admin/users", label: "Pengguna", icon: Users },
   { href: "/dashboard/admin/analytics", label: "Analitik", icon: BarChart3 },
   { href: "/dashboard/admin/settings", label: "Pengaturan", icon: Settings },
 ];
 
 const developerNavItems = [
-  { href: "/dashboard/developer", label: "Dasbor", icon: LayoutDashboard },
+  { href: "/dashboard/developer", label: "Beranda", icon: LayoutDashboard },
   { href: "/dashboard/developer/projects", label: "Proyek", icon: FolderKanban },
   { href: "/dashboard/developer/subscription", label: "Langganan", icon: CreditCard },
   { href: "/dashboard/developer/settings", label: "Pengaturan", icon: Settings },

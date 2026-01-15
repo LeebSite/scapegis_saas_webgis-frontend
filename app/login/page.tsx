@@ -208,8 +208,8 @@ export default function LoginPage() {
 									<span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">Scapegis</span>
 								</div>
 							</div>
-							<CardTitle className="text-2xl text-center">Log in or sign up</CardTitle>
-							<CardDescription className="text-center">You'll get smarter responses and can upload files, images, and more.</CardDescription>
+							<CardTitle className="text-2xl text-center">Masuk atau Daftar</CardTitle>
+							<CardDescription className="text-center">Anda akan mendapatkan respons yang lebih cerdas dan dapat mengunggah file, gambar, dan lainnya.</CardDescription>
 						</CardHeader>
 						<CardContent>
 							{/* Google OAuth Button */}
@@ -230,7 +230,7 @@ export default function LoginPage() {
 									<span className="w-full border-t" />
 								</div>
 								<div className="relative flex justify-center text-xs uppercase">
-									<span className="bg-card px-2 text-muted-foreground">OR</span>
+									<span className="bg-card px-2 text-muted-foreground">ATAU</span>
 								</div>
 							</div>
 
@@ -240,7 +240,7 @@ export default function LoginPage() {
 									<Input
 										id="email"
 										type="email"
-										placeholder="Email address"
+										placeholder="Alamat Email"
 										value={email}
 										onChange={(e) => setEmail(e.target.value)}
 										required
@@ -259,7 +259,7 @@ export default function LoginPage() {
 									disabled={isLoading}
 									className="w-full"
 								>
-									{isLoading ? 'Checking...' : 'Continue'}
+									{isLoading ? 'Memeriksa...' : 'Lanjutkan'}
 								</Button>
 							</form>
 						</CardContent>
@@ -283,7 +283,7 @@ export default function LoginPage() {
 								<span className="font-kayak text-2xl tracking-wide font-semibold text-[#01123E]">Scapegis</span>
 							</div>
 						</div>
-						<CardTitle className="text-2xl text-center">Enter your password</CardTitle>
+						<CardTitle className="text-2xl text-center">Masukkan kata sandi Anda</CardTitle>
 					</CardHeader>
 					<CardContent>
 						{/* Show email (read-only) */}
@@ -294,7 +294,7 @@ export default function LoginPage() {
 								onClick={() => setStep('email')}
 								className="text-sm text-primary hover:underline mt-1"
 							>
-								Edit
+								Ubah
 							</button>
 						</div>
 
@@ -305,7 +305,7 @@ export default function LoginPage() {
 									<Input
 										id="password"
 										type={showPassword ? "text" : "password"}
-										placeholder="Password"
+										placeholder="Kata Sandi"
 										value={password}
 										onChange={(e) => setPassword(e.target.value)}
 										required
@@ -339,15 +339,15 @@ export default function LoginPage() {
 							)}
 
 							<Button type="submit" disabled={isLoading} className="w-full">
-								{isLoading ? 'Signing in...' : 'Continue'}
+								{isLoading ? 'Masuk...' : 'Lanjutkan'}
 							</Button>
 						</form>
 
 						{/* Link to signup */}
 						<div className="mt-4 text-center text-sm">
-							<span className="text-muted-foreground">Don't have an account? </span>
+							<span className="text-muted-foreground">Belum punya akun? </span>
 							<Link href="/signup" className="text-primary hover:underline">
-								Sign up
+								Daftar
 							</Link>
 
 						</div>
@@ -369,20 +369,20 @@ export default function LoginPage() {
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
 								</svg>
 							</div>
-							<h2 className="text-2xl font-bold mb-2">Check your email</h2>
+							<h2 className="text-2xl font-bold mb-2">Periksa email Anda</h2>
 							<p className="text-muted-foreground mb-4">
-								We've sent a magic link to <strong>{email}</strong>.
-								Click the link to sign in as admin.
+								Kami telah mengirim tautan ajaib ke <strong>{email}</strong>.
+								Klik tautan untuk masuk sebagai admin.
 							</p>
 							<p className="text-sm text-muted-foreground">
-								The link expires in 10 minutes.
+								Tautan kadaluarsa dalam 10 menit.
 							</p>
 							<Button
 								variant="ghost"
 								onClick={() => setStep('email')}
 								className="mt-4"
 							>
-								← Back to login
+								← Kembali ke login
 							</Button>
 						</div>
 					</CardContent>

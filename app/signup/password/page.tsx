@@ -35,7 +35,7 @@ export default function SignupPasswordPage() {
                     router.push('/signup/verify');
                 })
                 .catch((err) => {
-                    setError(err instanceof Error ? err.message : 'Failed to send code');
+                    setError(err instanceof Error ? err.message : 'Gagal mengirim kode');
                     setLoading(false);
                 });
         }
@@ -47,7 +47,7 @@ export default function SignupPasswordPage() {
         setError('');
 
         if (password.length < 8) {
-            setError('Password must be at least 8 characters');
+            setError('Kata sandi harus minimal 8 karakter');
             setLoading(false);
             return;
         }
@@ -61,7 +61,7 @@ export default function SignupPasswordPage() {
             router.push('/signup/verify');
         } catch (err) {
             // ✅ FIX: Properly extract error message
-            let errorMessage = 'Failed to send code';
+            let errorMessage = 'Gagal mengirim kode';
 
             if (err instanceof Error) {
                 errorMessage = err.message;
@@ -73,9 +73,9 @@ export default function SignupPasswordPage() {
 
             // Handle specific errors
             if (errorMessage.includes('429') || errorMessage.includes('Too Many Requests')) {
-                setError('Too many attempts. Please wait a few minutes.');
+                setError('Terlalu banyak percobaan. Silakan tunggu beberapa menit.');
             } else if (errorMessage.includes('already registered')) {
-                setError('Email already registered. Try logging in instead.');
+                setError('Email sudah terdaftar. Silakan login.');
             } else {
                 setError(errorMessage);
             }
@@ -88,39 +88,39 @@ export default function SignupPasswordPage() {
         <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
             <div className="max-w-md w-full space-y-8 p-8 bg-card rounded-lg shadow-lg border">
                 <div>
-                    <h2 className="text-3xl font-bold">Create a password</h2>
+                    <h2 className="text-3xl font-bold">Buat kata sandi</h2>
                     <p className="mt-2 text-muted-foreground">
-                        You'll use this password to log in to ScapeGIS
+                        Anda akan menggunakan kata sandi ini untuk masuk ke ScapeGIS
                     </p>
                 </div>
 
                 <div className="bg-muted rounded-md p-3">
-                    <p className="text-sm text-muted-foreground">Email address</p>
+                    <p className="text-sm text-muted-foreground">Alamat Email</p>
                     <p className="font-medium">{email}</p>
                     <button
                         onClick={() => router.push('/signup')}
                         className="text-sm text-primary hover:underline mt-1"
                     >
-                        Edit
+                        Ubah
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium mb-2">
-                            Password
+                            Kata Sandi
                         </label>
                         <Input
                             id="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="At least 8 characters"
+                            placeholder="Minimal 8 karakter"
                             required
                             autoFocus
                         />
                         <p className="mt-1 text-xs text-muted-foreground">
-                            Use at least 8 characters
+                            Gunakan minimal 8 karakter
                         </p>
                     </div>
 
@@ -131,7 +131,7 @@ export default function SignupPasswordPage() {
                     )}
 
                     <Button type="submit" disabled={loading} className="w-full">
-                        {loading ? 'Sending code...' : 'Continue'}
+                        {loading ? 'Mengirim kode...' : 'Lanjutkan'}
                     </Button>
                 </form>
             </div>

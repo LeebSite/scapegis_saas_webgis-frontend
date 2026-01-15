@@ -61,7 +61,7 @@ export default function VerifyPage() {
         const finalCode = codeString || code.join('');
 
         if (finalCode.length !== 6) {
-            setError('Please enter all 6 digits');
+            setError('Mohon masukkan 6 digit kode');
             return;
         }
 
@@ -109,11 +109,11 @@ export default function VerifyPage() {
 
             // Handle specific backend errors
             if (errorMessage.toLowerCase().includes('expired')) {
-                setError('Code expired. Click "Resend code" below.');
+                setError('Kode kadaluarsa. Klik "Kirim ulang kode" di bawah.');
             } else if (errorMessage.toLowerCase().includes('already used')) {
-                setError('Code already used. Please request a new one.');
+                setError('Kode sudah digunakan. Silakan minta kode baru.');
             } else {
-                setError('Invalid verification code. Please try again.');
+                setError('Kode verifikasi salah. Silakan coba lagi.');
             }
 
             // Clear inputs on error
@@ -161,7 +161,7 @@ export default function VerifyPage() {
             inputRefs.current[0]?.focus();
             console.log('✅ New OTP sent');
         } catch (err) {
-            setError('Failed to resend code');
+            setError('Gagal mengirim ulang kode');
         } finally {
             setResending(false);
         }
@@ -171,21 +171,21 @@ export default function VerifyPage() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow border">
                 <div className="text-center">
-                    <h2 className="text-3xl font-bold">Check your inbox</h2>
+                    <h2 className="text-3xl font-bold">Periksa kotak masuk Anda</h2>
                     <p className="mt-2 text-gray-600">
-                        Enter the verification code we sent to
+                        Masukkan kode verifikasi yang kami kirim ke
                     </p>
                     <p className="font-medium mt-1">{email}</p>
                     {/* ✅ Show different message based on flow */}
                     <p className="text-sm text-gray-500 mt-2">
-                        {authType === 'signup' ? 'Complete your signup' : 'Login to your account'}
+                        {authType === 'signup' ? 'Selesaikan pendaftaran Anda' : 'Masuk ke akun Anda'}
                     </p>
                 </div>
 
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 text-center mb-3">
-                            Code
+                            Kode
                         </label>
                         <div className="flex gap-2 justify-center">
                             {code.map((digit, index) => (
@@ -216,7 +216,7 @@ export default function VerifyPage() {
                         disabled={loading || code.some(d => !d)}
                         className="w-full py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
                     >
-                        {loading ? 'Verifying...' : 'Continue'}
+                        {loading ? 'Memverifikasi...' : 'Lanjutkan'}
                     </button>
 
                     <div className="text-center">
@@ -225,7 +225,7 @@ export default function VerifyPage() {
                             disabled={resending || loading}
                             className="text-sm text-blue-600 hover:underline disabled:text-gray-400"
                         >
-                            {resending ? 'Sending...' : 'Resend code'}
+                            {resending ? 'Mengirim...' : 'Kirim ulang kode'}
                         </button>
                     </div>
                 </div>
