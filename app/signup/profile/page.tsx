@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signupComplete } from '@/lib/api/authService';
+import { signupComplete, getCurrentUser } from '@/lib/api/authService';
+import { useAuthStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export default function SignupProfilePage() {
     const router = useRouter();
+    const setUser = useAuthStore((state) => state.setUser);
     const [email, setEmail] = useState('');
     const [tempToken, setTempToken] = useState('');
     const [name, setName] = useState('');
@@ -56,6 +58,10 @@ export default function SignupProfilePage() {
                 name,
                 birthday  // Already in YYYY-MM-DD format from date input
             });
+
+            // Fetch user and update store
+            const user = await getCurrentUser();
+            setUser(user);
 
             // Clear signup data
             sessionStorage.removeItem('signup_email');

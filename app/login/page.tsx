@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
@@ -9,21 +9,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserRole } from "@/lib/types/auth";
 import { getDashboardRoute } from "@/lib/utils";
-import { login, googleOAuth, getCurrentUser, signupInit, adminRequestMagicLink } from "@/lib/api/authService";
+import { login, googleOAuth, getCurrentUser, signupInit, adminRequestMagicLink, loginRequestOTP, loginVerifyOTP } from "@/lib/api/authService";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-type LoginStep = 'email' | 'password' | 'admin-link-sent';
+type LoginStep = 'email' | 'password' | 'otp' | 'admin-link-sent';
+type LoginMethod = 'password' | 'otp';
 
 export default function LoginPage() {
 	const router = useRouter();
 	const setUser = useAuthStore((state) => state.setUser);
 
 	const [step, setStep] = useState<LoginStep>('email');
+	const [loginMethod, setLoginMethod] = useState<LoginMethod>('otp'); // Default to OTP
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [otp, setOtp] = useState(['', '', '', '', '', '']);
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
 	// Step 1: Check email to determine flow
 	const handleEmailContinue = async (e: React.FormEvent) => {
@@ -35,14 +39,46 @@ export default function LoginPage() {
 			// Call backend to check if email exists and get role
 			const response = await signupInit({ email });
 
-			// If password_required, this is an existing developer or new signup
+			// If password_required, this is an existing user
 			if (response.status === 'password_required') {
-				// For existing users, show password field
-				// For new users, backend will handle this in signup flow
-				setStep('password');
+				// ✅ EXISTING USER: Auto-send OTP and redirect to verify page
+				console.log('✅ Existing user detected, sending OTP...');
+				try {
+					await loginRequestOTP({ email });
+
+					// Store session data for verify page
+					sessionStorage.setItem('auth_email', email);
+					sessionStorage.setItem('auth_type', 'login');
+
+					console.log('✅ OTP sent to:', email);
+					router.push('/signup/verify');
+				} catch (otpErr: any) {
+					// Fallback: If OTP request fails with 404, treat as new user
+					const msg = otpErr.message || '';
+					if (msg.includes('404') || msg.toLowerCase().includes('not found')) {
+						console.log('⚠️ OTP request 404, redirecting to signup...');
+						sessionStorage.setItem('signup_email', email);
+						router.push('/signup/password');
+						return;
+					}
+					setError('Gagal mengirim OTP. Silakan coba lagi.');
+				}
+			} else {
+				// ✅ NEW USER: Redirect to signup password creation
+				console.log('✅ New user detected, redirecting to signup...');
+				sessionStorage.setItem('signup_email', email);
+				router.push('/signup/password');
+				return;
 			}
 		} catch (err: any) {
-			const errorMsg = err.message || "";
+			// ✅ FIX: Properly extract error message
+			let errorMsg = 'Failed to continue';
+
+			if (err instanceof Error) {
+				errorMsg = err.message;
+			} else if (typeof err === 'object' && err !== null) {
+				errorMsg = err.detail || err.message || JSON.stringify(err);
+			}
 
 			// Check if this is "email not found" or "user doesn't exist"
 			if (errorMsg.toLowerCase().includes('not found') ||
@@ -51,6 +87,32 @@ export default function LoginPage() {
 				// New user - redirect to signup flow
 				sessionStorage.setItem('signup_email', email);
 				router.push('/signup/password');
+				return;
+			}
+
+			// ✅ Check if "Email already registered" - EXISTING USER!
+			if (errorMsg.toLowerCase().includes('already registered') ||
+				errorMsg.toLowerCase().includes('already exists')) {
+				// Existing user - send OTP and redirect to verify page
+				console.log('✅ Email already registered, sending OTP...');
+				try {
+					await loginRequestOTP({ email });
+
+					// Store session data for verify page
+					sessionStorage.setItem('auth_email', email);
+					sessionStorage.setItem('auth_type', 'login');
+
+					console.log('✅ OTP sent to:', email);
+					router.push('/signup/verify');
+				} catch (otpErr: any) {
+					let otpErrorMsg = 'Gagal mengirim OTP';
+					if (otpErr instanceof Error) {
+						otpErrorMsg = otpErr.message;
+					} else if (typeof otpErr === 'object' && otpErr !== null) {
+						otpErrorMsg = otpErr.detail || otpErr.message || JSON.stringify(otpErr);
+					}
+					setError(otpErrorMsg);
+				}
 				return;
 			}
 
@@ -64,8 +126,12 @@ export default function LoginPage() {
 					setError(adminErr.message || "Failed to send magic link");
 				}
 			} else {
-				// Other errors
-				setError(errorMsg || "Failed to continue");
+				// Other errors (including rate limit)
+				if (errorMsg.toLowerCase().includes('429') || errorMsg.toLowerCase().includes('too many')) {
+					setError('Terlalu banyak percobaan. Silakan tunggu beberapa menit.');
+				} else {
+					setError(errorMsg);
+				}
 			}
 		} finally {
 			setIsLoading(false);
@@ -125,6 +191,9 @@ export default function LoginPage() {
 			setIsLoading(false);
 		}
 	};
+
+
+
 
 	// Email step - ChatGPT style
 	if (step === 'email') {
@@ -199,6 +268,8 @@ export default function LoginPage() {
 			</GoogleOAuthProvider>
 		);
 	}
+
+
 
 	// Password step - for existing developers
 	if (step === 'password') {
@@ -278,6 +349,7 @@ export default function LoginPage() {
 							<Link href="/signup" className="text-primary hover:underline">
 								Sign up
 							</Link>
+
 						</div>
 					</CardContent>
 				</Card>

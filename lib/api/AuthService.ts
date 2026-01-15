@@ -143,3 +143,25 @@ export async function logout(): Promise<void> {
         method: 'POST',
     });
 }
+
+// ===== PASSWORDLESS OTP LOGIN =====
+
+/**
+ * Request OTP for passwordless login
+ */
+export async function loginRequestOTP(data: { email: string }) {
+    return fetchAPI('/api/v1/auth/login/request-otp', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+/**
+ * Verify OTP and login
+ */
+export async function loginVerifyOTP(data: { email: string; code: string }): Promise<AuthTokens> {
+    return fetchAPI('/api/v1/auth/login/verify-otp', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
