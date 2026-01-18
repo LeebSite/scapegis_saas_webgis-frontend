@@ -46,20 +46,24 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 208 88% 53%; /* Matches Primary */
+    --ring: 208 88% 53%;
+    /* Matches Primary */
     --radius: 0.5rem;
 
     /* Chart colors mapping to new palette */
-    --chart-1: 208 88% 53%; /* Electric Blue */
-    --chart-2: 168 100% 36%; /* Turquoise Green */
-    --chart-3: 248 69% 63%; /* Light Indigo */
+    --chart-1: 208 88% 53%;
+    /* Electric Blue */
+    --chart-2: 168 100% 36%;
+    /* Turquoise Green */
+    --chart-3: 248 69% 63%;
+    /* Light Indigo */
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
   }
 
   .dark {
     /* Base: Grayish Black (Slate 950-ish) */
-    --background: 222 47% 11%; 
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
     /* Card: Slightly lighter than bg */
@@ -90,7 +94,8 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 208 88% 53%; /* Matches Primary */
+    --ring: 208 88% 53%;
+    /* Matches Primary */
 
     --chart-1: 208 88% 53%;
     --chart-2: 168 100% 36%;
@@ -104,9 +109,42 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
 
+/* Fix Leaflet z-index issues with other UI components */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 0 !important;
+}
+
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+  z-index: 1 !important;
+}
+
+/* Ensure popups appear above other elements */
+.leaflet-popup {
+  z-index: 999 !important;
+}
+
+/* Custom animations for GIS upload */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}

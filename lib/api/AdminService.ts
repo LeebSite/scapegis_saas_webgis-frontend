@@ -49,22 +49,22 @@ export interface UserDetailResponse extends User {
 
 // 1. Get All Users (Table)
 export async function getAdminUsers() {
-  return fetchAPI<User[]>('/api/v1/admin/users');
+  return fetchAPI<User[]>('/admin/users');
 }
 
 // 2. Get User Statistics (Cards)
 export async function getAdminStats() {
-  return fetchAPI<UserStats>('/api/v1/admin/users/statistics');
+  return fetchAPI<UserStats>('/admin/users/statistics');
 }
 
 // 2.5 Get User Detail (Preserved for compatibility)
 export async function getAdminUserDetail(userId: string) {
-  return fetchAPI<UserDetailResponse>(`/api/v1/admin/users/${userId}`);
+  return fetchAPI<UserDetailResponse>(`/admin/users/${userId}`);
 }
 
 // 3. Toggle User Status (Active/Inactive)
 export async function updateUserStatus(userId: string, isActive: boolean) {
-  return fetchAPI(`/api/v1/admin/users/${userId}/status`, {
+  return fetchAPI(`/admin/users/${userId}/status`, {
     method: 'PUT',
     body: JSON.stringify({ is_active: isActive })
   });
@@ -72,7 +72,7 @@ export async function updateUserStatus(userId: string, isActive: boolean) {
 
 // 4. Update User Role
 export async function updateUserRole(userId: string, role: 'admin' | 'developer') {
-  return fetchAPI(`/api/v1/admin/users/${userId}/role`, {
+  return fetchAPI(`/admin/users/${userId}/role`, {
     method: 'PUT',
     body: JSON.stringify({ role })
   });
@@ -80,7 +80,7 @@ export async function updateUserRole(userId: string, role: 'admin' | 'developer'
 
 // 5. Delete User
 export async function deleteUser(userId: string) {
-  return fetchAPI(`/api/v1/admin/users/${userId}`, {
+  return fetchAPI(`/admin/users/${userId}`, {
     method: 'DELETE'
   });
 }
@@ -88,7 +88,7 @@ export async function deleteUser(userId: string) {
 // 6. Get Audit Logs
 export async function getAuditLogs(params?: { action?: string; user_id?: string }) {
   const qs = new URLSearchParams(params as any).toString();
-  return fetchAPI(`/api/v1/admin/audit-logs?${qs}`);
+  return fetchAPI(`/admin/audit-logs?${qs}`);
 }
 
 // Backward compatibility object

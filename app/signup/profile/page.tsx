@@ -52,12 +52,20 @@ export default function SignupProfilePage() {
         });
 
         try {
-            await signupComplete({
+            // ✅ FIX: Capture tokens and store in localStorage
+            const tokens = await signupComplete({
                 email,
                 temp_token: tempToken,
                 name,
                 birthday  // Already in YYYY-MM-DD format from date input
             });
+
+            if (tokens && tokens.access_token) {
+                localStorage.setItem('access_token', tokens.access_token);
+                if (tokens.refresh_token) {
+                    localStorage.setItem('refresh_token', tokens.refresh_token);
+                }
+            }
 
             // Fetch user and update store
             const user = await getCurrentUser();

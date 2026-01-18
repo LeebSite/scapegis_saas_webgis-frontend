@@ -20,7 +20,7 @@ export const adminNavItems: NavItem[] = [
   { href: "/dashboard/admin/users", label: "Users", icon: Users },
   { href: "/dashboard/admin/subscriptions", label: "Subscriptions", icon: CreditCard },
   { href: "/dashboard/admin/map-requests", label: "Map Requests", icon: Map },
-  { href: "/dashboard/admin/gis-data", label: "GIS Data", icon: Database },
+  { href: "/dashboard/admin/gis-datasets", label: "GIS Datasets", icon: Database },
   { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
 ];
 

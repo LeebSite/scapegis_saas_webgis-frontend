@@ -145,7 +145,17 @@ export default function LoginPage() {
 		setError(null);
 
 		try {
-			await login({ email, password });
+			// ✅ FIX: Capture tokens and store in localStorage
+			const tokens = await login({ email, password });
+
+			if (tokens && tokens.access_token) {
+				localStorage.setItem('access_token', tokens.access_token);
+				// Check if refresh_token exists before saving
+				if (tokens.refresh_token) {
+					localStorage.setItem('refresh_token', tokens.refresh_token);
+				}
+			}
+
 			const user = await getCurrentUser();
 			setUser(user);
 
@@ -178,7 +188,16 @@ export default function LoginPage() {
 		setError(null);
 
 		try {
-			await googleOAuth({ id_token: credentialResponse.credential });
+			// ✅ FIX: Capture tokens and store in localStorage
+			const tokens = await googleOAuth({ id_token: credentialResponse.credential });
+
+			if (tokens && tokens.access_token) {
+				localStorage.setItem('access_token', tokens.access_token);
+				if (tokens.refresh_token) {
+					localStorage.setItem('refresh_token', tokens.refresh_token);
+				}
+			}
+
 			const user = await getCurrentUser();
 			setUser(user);
 			const dashboardRoute = getDashboardRoute(user.role);

@@ -29,13 +29,22 @@ export async function fetchAPI<T>(
     // ✅ DEBUG: Log every API call
     console.log('📡 API Call:', fullUrl);
 
+    // ✅ FIX: Get token from localStorage
+    const token = localStorage.getItem('access_token');
+
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+    };
+
+    if (token) {
+        (headers as any)['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(fullUrl, {
         ...options,
         credentials: 'include', // CRITICAL: for HttpOnly cookies
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers,
-        },
+        headers,
     });
 
     if (!response.ok) {
@@ -58,7 +67,7 @@ export async function fetchAPI<T>(
 export async function signupInit(
     data: SignupInitRequest
 ): Promise<SignupInitResponse> {
-    return fetchAPI('/api/v1/auth/signup/init', {
+    return fetchAPI('/auth/signup/init', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -67,7 +76,7 @@ export async function signupInit(
 export async function signupPassword(
     data: SignupPasswordRequest
 ): Promise<SignupPasswordResponse> {
-    return fetchAPI('/api/v1/auth/signup/password', {
+    return fetchAPI('/auth/signup/password', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -76,7 +85,7 @@ export async function signupPassword(
 export async function signupVerify(
     data: SignupVerifyRequest
 ): Promise<SignupVerifyResponse> {
-    return fetchAPI('/api/v1/auth/signup/verify', {
+    return fetchAPI('/auth/signup/verify', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -85,7 +94,7 @@ export async function signupVerify(
 export async function signupComplete(
     data: SignupCompleteRequest
 ): Promise<AuthTokens> {
-    return fetchAPI('/api/v1/auth/signup/complete', {
+    return fetchAPI('/auth/signup/complete', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -96,7 +105,7 @@ export async function signupComplete(
 export async function login(
     data: LoginRequest
 ): Promise<AuthTokens> {
-    return fetchAPI('/api/v1/auth/login', {
+    return fetchAPI('/auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -105,7 +114,7 @@ export async function login(
 export async function googleOAuth(
     data: GoogleOAuthRequest
 ): Promise<AuthTokens> {
-    return fetchAPI('/api/v1/auth/oauth/google', {
+    return fetchAPI('/auth/oauth/google', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -116,7 +125,7 @@ export async function googleOAuth(
 export async function adminRequestMagicLink(
     data: AdminMagicLinkRequest
 ): Promise<AdminMagicLinkResponse> {
-    return fetchAPI('/api/v1/auth/admin/request-link', {
+    return fetchAPI('/auth/admin/request-link', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -125,7 +134,7 @@ export async function adminRequestMagicLink(
 export async function adminVerifyMagicLink(
     token: string
 ): Promise<AuthTokens> {
-    return fetchAPI(`/api/v1/auth/admin/verify?token=${token}`, {
+    return fetchAPI(`/auth/admin/verify?token=${token}`, {
         method: 'GET',
     });
 }
@@ -133,13 +142,13 @@ export async function adminVerifyMagicLink(
 // ===== USER INFO =====
 
 export async function getCurrentUser(): Promise<User> {
-    return fetchAPI('/api/v1/auth/me', {
+    return fetchAPI('/auth/me', {
         method: 'GET',
     });
 }
 
 export async function logout(): Promise<void> {
-    await fetchAPI('/api/v1/auth/logout', {
+    await fetchAPI('/auth/logout', {
         method: 'POST',
     });
 }
@@ -150,7 +159,7 @@ export async function logout(): Promise<void> {
  * Request OTP for passwordless login
  */
 export async function loginRequestOTP(data: { email: string }) {
-    return fetchAPI('/api/v1/auth/login/request-otp', {
+    return fetchAPI('/auth/login/request-otp', {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -160,7 +169,7 @@ export async function loginRequestOTP(data: { email: string }) {
  * Verify OTP and login
  */
 export async function loginVerifyOTP(data: { email: string; code: string }): Promise<AuthTokens> {
-    return fetchAPI('/api/v1/auth/login/verify-otp', {
+    return fetchAPI('/auth/login/verify-otp', {
         method: 'POST',
         body: JSON.stringify(data),
     });
